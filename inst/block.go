@@ -30,9 +30,6 @@ func (b *Block) Label() Label {
 }
 
 func (b *Block) String() string {
-	if b.jump == nil {
-		panic("jump not inserted in block")
-	}
 	var builder = strings.Builder{}
 	builder.WriteString(b.label.String())
 	builder.WriteByte('\n')
@@ -46,8 +43,10 @@ func (b *Block) String() string {
 		builder.WriteString(fmt.Sprint(inst))
 		builder.WriteByte('\n')
 	}
-	builder.WriteByte('\t')
-	builder.WriteString(fmt.Sprint(b.jump))
-	builder.WriteByte('\n')
+	if b.jump != nil {
+		builder.WriteByte('\t')
+		builder.WriteString(fmt.Sprint(b.jump))
+		builder.WriteByte('\n')
+	}
 	return builder.String()
 }

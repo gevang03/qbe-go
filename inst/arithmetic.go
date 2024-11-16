@@ -26,7 +26,7 @@ func (b *Block) InsertDiv(dest value.Temporary, type_ types.BaseType, src1, src2
 }
 
 func (b *Block) InsertNeg(dest value.Temporary, type_ types.BaseType, src value.Value) {
-	inst := newSimpleInst(add, dest, type_, src)
+	inst := newSimpleInst(neg, dest, type_, src)
 	b.insertInstruction(inst)
 }
 
