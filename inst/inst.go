@@ -1,3 +1,4 @@
+// package inst exports functions and types used to generate basic blocks and instructions for QBE code.
 package inst
 
 import (
@@ -8,9 +9,10 @@ import (
 	"github.com/gevang03/qbe-go/value"
 )
 
+// A Dest represents the destination to store the result of an instruction.
 type Dest struct {
-	Name value.Temporary
-	Type types.ABIType
+	Name value.Temporary // The name of the destination.
+	Type types.ABIType   // The type of the destination.
 }
 
 type simpleInst struct {

@@ -5,17 +5,23 @@ import (
 	"strings"
 )
 
+// A Label represents the name of the entrypoint to a [Block].
 type Label string
 
+// String converts l to a string compatible with QBE code.
 func (l Label) String() string { return "@" + string(l) }
 
+// A Block represents a QBE basic block.
 type Block struct {
 	label Label
-	phis  []Phi
+	phis  []phi
 	insts []inst
 	jump
 }
 
+// NewBlock creates a new [Block] with label at its entrypoint,
+// no phi nodes or regular instructions and no terminating instruction, i.e
+// control flow falls through to the next basic block.
 func NewBlock(label Label) *Block {
 	return &Block{
 		label: label,
@@ -25,10 +31,12 @@ func NewBlock(label Label) *Block {
 	}
 }
 
+// Label returns the label of b.
 func (b *Block) Label() Label {
 	return b.label
 }
 
+// String converts b to a string compatible with QBE code.
 func (b *Block) String() string {
 	var builder = strings.Builder{}
 	builder.WriteString(b.label.String())

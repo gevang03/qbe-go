@@ -8,11 +8,12 @@ import (
 	"github.com/gevang03/qbe-go/value"
 )
 
+// A Data struct represent a data definition in QBE IL.
 type Data struct {
-	Linkage
-	Name   value.GlobalSymbol
-	Align  uint
-	Fields []dataField
+	Linkage                    // The linkage of the data definition
+	Name    value.GlobalSymbol // The symbol that references the data
+	Align   uint               // The required alignment of the data. Set to zero for default alignment
+	fields  []dataField        // Values contained into the data definition.
 }
 
 func (*Data) isDefinition() {}
@@ -31,14 +32,22 @@ type (
 func (dataFieldValue) isDataField()  {}
 func (dataFieldZeroes) isDataField() {}
 
+// NewData returns a new Data with symbol name, private linkage aligment 0, and no data entries.
+func NewData(name value.GlobalSymbol) *Data {
+	return &Data{Linkage: PrivateLinkage(), Name: name, Align: 0, fields: nil}
+}
+
+// InsertValue inserts to the end of the data entries the values of item... with type type_.
 func (data *Data) InsertValue(type_ types.ExtendedType, item ...value.DataItem) {
-	data.Fields = append(data.Fields, dataFieldValue{type_, item})
+	data.fields = append(data.fields, dataFieldValue{type_, item})
 }
 
+// InsertValue inserts count zeroes to the end of data.
 func (data *Data) InsertZeroes(count uint) {
-	data.Fields = append(data.Fields, dataFieldZeroes(count))
+	data.fields = append(data.fields, dataFieldZeroes(count))
 }
 
+// String converts data to a string compatible with QBE code.
 func (data *Data) String() string {
 	linkage := data.Linkage.String()
 	var parts []string
@@ -50,7 +59,7 @@ func (data *Data) String() string {
 		parts = append(parts, fmt.Sprint(data.Align))
 	}
 	parts = append(parts, "{")
-	for _, field := range data.Fields {
+	for _, field := range data.fields {
 		switch f := field.(type) {
 		case dataFieldValue:
 			parts = append(parts, fmt.Sprint(f.Type))

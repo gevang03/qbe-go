@@ -1,3 +1,4 @@
+// Package def exports various types and functions used to create QBE definitions.
 package def
 
 import (
@@ -9,17 +10,21 @@ type Definition interface {
 	isDefinition()
 }
 
+// Linkage represents the linkage of a definition ([Function] or [Data])
 type Linkage struct {
-	Export       bool
-	Thread       bool
-	SectionName  string
-	SectionFlags string
+	Export       bool   // Definition is visible
+	Thread       bool   // Data definition has thread local storage
+	SectionName  string // Section to store definition
+	SectionFlags string // Other flags specified for a section
 }
 
+// PrivateLinkage returns a [Linkage] for a non exported, non thread local storage
+// and no section information specified.
 func PrivateLinkage() Linkage {
 	return Linkage{false, false, "", ""}
 }
 
+// String converts l to a string compatible with QBE code.
 func (l *Linkage) String() string {
 	var parts []string
 	if l.Export {

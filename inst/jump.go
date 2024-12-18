@@ -42,18 +42,25 @@ func (r ret) String() string {
 
 func (hlt) String() string { return "hlt" }
 
+// InsertJmp terminates b with an unconditional jump to the block that begins at label.
 func (b *Block) InsertJmp(label Label) {
 	b.jump = jmp{label}
 }
 
+// InsertJnz terminates b with a conditional jump based on value.
+// If value evaluates to non-zero, control flow directs to notZero,
+// otherwise to zero.
 func (b *Block) InsertJnz(value value.Value, notZero, zero Label) {
 	b.jump = jnz{value, notZero, zero}
 }
 
+// InsertRet terminates b with a return instruction, returning value.
+// If value is nil no value is set as the operand of the instruction.
 func (b *Block) InsertRet(value value.Value) {
 	b.jump = ret{value}
 }
 
+// InsertHlt terminates b with a halt instruction.
 func (b *Block) InsertHlt() {
 	b.jump = hlt{}
 }

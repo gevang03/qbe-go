@@ -5,6 +5,8 @@ import (
 	"github.com/gevang03/qbe-go/value"
 )
 
+// InsertCeq adds a ceq instruction at the end of b, comparing values src1 and
+// src2 of srcType type and storing the result to dest with destType type.
 func (b *Block) InsertCeq(dest value.Temporary, destType types.IntegralType,
 	src1, src2 value.Value, srcType types.BaseType) {
 	var op opcode
@@ -23,6 +25,9 @@ func (b *Block) InsertCeq(dest value.Temporary, destType types.IntegralType,
 	b.insertInstruction(inst)
 }
 
+// InsertCge adds a cge instruction at the end of b, comparing floating point
+// values src1 and src2 of srcType type and storing the result to dest with
+// destType type.
 func (b *Block) InsertCge(dest value.Temporary, destType types.IntegralType,
 	src1, src2 value.Value, srcType types.FloatingPointType) {
 	var op opcode
@@ -37,6 +42,9 @@ func (b *Block) InsertCge(dest value.Temporary, destType types.IntegralType,
 	b.insertInstruction(inst)
 }
 
+// InsertCgt adds a cgt instruction at the end of b, comparing floating point
+// values src1 and src2 of srcType type and storing the result to dest with
+// destType type.
 func (b *Block) InsertCgt(dest value.Temporary, destType types.IntegralType,
 	src1, src2 value.Value, srcType types.FloatingPointType) {
 	var op opcode
@@ -51,6 +59,9 @@ func (b *Block) InsertCgt(dest value.Temporary, destType types.IntegralType,
 	b.insertInstruction(inst)
 }
 
+// InsertCle adds a cle instruction at the end of b, comparing floating point
+// values src1 and src2 of srcType type and storing the result to dest with
+// destType type.
 func (b *Block) InsertCle(dest value.Temporary, destType types.IntegralType,
 	src1, src2 value.Value, srcType types.FloatingPointType) {
 	var op opcode
@@ -65,6 +76,9 @@ func (b *Block) InsertCle(dest value.Temporary, destType types.IntegralType,
 	b.insertInstruction(inst)
 }
 
+// InsertClt adds a clt instruction at the end of b, comparing floating point
+// values src1 and src2 of srcType type and storing the result to dest with
+// destType type.
 func (b *Block) InsertClt(dest value.Temporary, destType types.IntegralType,
 	src1, src2 value.Value, srcType types.FloatingPointType) {
 	var op opcode
@@ -79,6 +93,8 @@ func (b *Block) InsertClt(dest value.Temporary, destType types.IntegralType,
 	b.insertInstruction(inst)
 }
 
+// InsertCne adds a cne instruction at the end of b, comparing values src1 and
+// src2 of srcType type and storing the result to dest with destType type.
 func (b *Block) InsertCne(dest value.Temporary, destType types.IntegralType,
 	src1, src2 value.Value, srcType types.BaseType) {
 	var op opcode
@@ -97,6 +113,9 @@ func (b *Block) InsertCne(dest value.Temporary, destType types.IntegralType,
 	b.insertInstruction(inst)
 }
 
+// InsertCo adds a co instruction at the end of b, comparing floating point
+// values src1 and src2 of srcType type and storing the result to dest with
+// destType type.
 func (b *Block) InsertCo(dest value.Temporary, destType types.IntegralType,
 	src1, src2 value.Value, srcType types.FloatingPointType) {
 	var op opcode
@@ -111,6 +130,9 @@ func (b *Block) InsertCo(dest value.Temporary, destType types.IntegralType,
 	b.insertInstruction(inst)
 }
 
+// InsertCsge adds a csge instruction at the end of b, comparing integral
+// values src1 and src2 of srcType type and storing the result to dest with
+// destType type.
 func (b *Block) InsertCsge(dest value.Temporary, destType types.IntegralType,
 	src1, src2 value.Value, srcType types.IntegralType) {
 	var op opcode
@@ -125,6 +147,9 @@ func (b *Block) InsertCsge(dest value.Temporary, destType types.IntegralType,
 	b.insertInstruction(inst)
 }
 
+// InsertCsgt adds a csgt instruction at the end of b, comparing integral
+// values src1 and src2 of srcType type and storing the result to dest with
+// destType type.
 func (b *Block) InsertCsgt(dest value.Temporary, destType types.IntegralType,
 	src1, src2 value.Value, srcType types.IntegralType) {
 	var op opcode
@@ -139,6 +164,9 @@ func (b *Block) InsertCsgt(dest value.Temporary, destType types.IntegralType,
 	b.insertInstruction(inst)
 }
 
+// InsertCsle adds a csle instruction at the end of b, comparing integral
+// values src1 and src2 of srcType type and storing the result to dest with
+// destType type.
 func (b *Block) InsertCsle(dest value.Temporary, destType types.IntegralType,
 	src1, src2 value.Value, srcType types.IntegralType) {
 	var op opcode
@@ -153,6 +181,9 @@ func (b *Block) InsertCsle(dest value.Temporary, destType types.IntegralType,
 	b.insertInstruction(inst)
 }
 
+// InsertCslt adds a cslt instruction at the end of b, comparing integral
+// values src1 and src2 of srcType type and storing the result to dest with
+// destType type.
 func (b *Block) InsertCslt(dest value.Temporary, destType types.IntegralType,
 	src1, src2 value.Value, srcType types.IntegralType) {
 	var op opcode
@@ -166,6 +197,10 @@ func (b *Block) InsertCslt(dest value.Temporary, destType types.IntegralType,
 	inst := newSimpleInst(op, dest, destType, src1, src2)
 	b.insertInstruction(inst)
 }
+
+// InsertCuge adds a cuge instruction at the end of b, comparing integral
+// values src1 and src2 of srcType type and storing the result to dest with
+// destType type.
 func (b *Block) InsertCuge(dest value.Temporary, destType types.IntegralType,
 	src1, src2 value.Value, srcType types.IntegralType) {
 	var op opcode
@@ -180,6 +215,9 @@ func (b *Block) InsertCuge(dest value.Temporary, destType types.IntegralType,
 	b.insertInstruction(inst)
 }
 
+// InsertCugt adds a cugt instruction at the end of b, comparing integral
+// values src1 and src2 of srcType type and storing the result to dest with
+// destType type.
 func (b *Block) InsertCugt(dest value.Temporary, destType types.IntegralType,
 	src1, src2 value.Value, srcType types.IntegralType) {
 	var op opcode
@@ -194,6 +232,9 @@ func (b *Block) InsertCugt(dest value.Temporary, destType types.IntegralType,
 	b.insertInstruction(inst)
 }
 
+// InsertCule adds a cule instruction at the end of b, comparing integral
+// values src1 and src2 of srcType type and storing the result to dest with
+// destType type.
 func (b *Block) InsertCule(dest value.Temporary, destType types.IntegralType,
 	src1, src2 value.Value, srcType types.IntegralType) {
 	var op opcode
@@ -208,6 +249,9 @@ func (b *Block) InsertCule(dest value.Temporary, destType types.IntegralType,
 	b.insertInstruction(inst)
 }
 
+// InsertCult adds a cult instruction at the end of b, comparing integral
+// values src1 and src2 of srcType type and storing the result to dest with
+// destType type.
 func (b *Block) InsertCult(dest value.Temporary, destType types.IntegralType,
 	src1, src2 value.Value, srcType types.IntegralType) {
 	var op opcode
@@ -222,6 +266,9 @@ func (b *Block) InsertCult(dest value.Temporary, destType types.IntegralType,
 	b.insertInstruction(inst)
 }
 
+// InsertCuo adds a cuo instruction at the end of b, comparing floating point
+// values src1 and src2 of srcType type and storing the result to dest with
+// destType type.
 func (b *Block) InsertCuo(dest value.Temporary, destType types.IntegralType,
 	src1, src2 value.Value, srcType types.FloatingPointType) {
 	var op opcode
