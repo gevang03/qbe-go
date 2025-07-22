@@ -2,7 +2,11 @@
 // and as instruction operands in the [inst] package.
 package value
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/gevang03/qbe-go/internal/validation"
+)
 
 type (
 	// A Value is one of the following:
@@ -60,10 +64,22 @@ func (s Single) String() string { return fmt.Sprintf("s_%v", float32(s)) }
 func (d Double) String() string { return fmt.Sprintf("d_%v", float64(d)) }
 
 // String converts sym to a string compatible with QBE code.
-func (sym GlobalSymbol) String() string { return "$" + string(sym) }
+func (sym GlobalSymbol) String() string {
+	s := string(sym)
+	if !validation.Validate(s) {
+		panic(fmt.Sprintf("Global symbol $%q is not valid", s))
+	}
+	return "$" + s
+}
 
 // String converts tls to a string compatible with QBE code.
-func (tls ThreadLocalSymbol) String() string { return "thread $" + string(tls) }
+func (tls ThreadLocalSymbol) String() string {
+	s := string(tls)
+	if !validation.Validate(s) {
+		panic(fmt.Sprintf("Thread local symbol thread $%q is not valid", s))
+	}
+	return "thread $" + s
+}
 
 // String converts str to a string compatible with QBE code.
 func (str DataString) String() string { return fmt.Sprintf("%q", string(str)) }
@@ -72,4 +88,10 @@ func (str DataString) String() string { return fmt.Sprintf("%q", string(str)) }
 func (addr Address) String() string { return fmt.Sprintf("%v + %v", addr.GlobalSymbol, addr.Offset) }
 
 // String converts tmp to a string compatible with QBE code.
-func (tmp Temporary) String() string { return "%" + string(tmp) }
+func (tmp Temporary) String() string {
+	s := string(tmp)
+	if !validation.Validate(s) {
+		panic(fmt.Sprintf("Temporary %%%q is not valid", s))
+	}
+	return "%" + s
+}

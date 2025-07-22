@@ -73,7 +73,7 @@ func (mod *Module) DefineFunction(name value.GlobalSymbol) *def.Function {
 func (mod *Module) ToIL(w *bufio.Writer) (int, error) {
 	written := 0
 	for _, def := range mod.definitions {
-		count, err := w.WriteString(fmt.Sprint(def))
+		count, err := fmt.Fprint(w, def)
 		written += count
 		if err != nil {
 			return written, err

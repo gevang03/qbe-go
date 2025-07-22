@@ -3,13 +3,21 @@ package inst
 import (
 	"fmt"
 	"strings"
+
+	"github.com/gevang03/qbe-go/internal/validation"
 )
 
 // A Label represents the name of the entrypoint to a [Block].
 type Label string
 
 // String converts l to a string compatible with QBE code.
-func (l Label) String() string { return "@" + string(l) }
+func (l Label) String() string {
+	s := string(l)
+	if !validation.Validate(s) {
+		panic(fmt.Sprintf("Label @%q is not valid", s))
+	}
+	return "@" + s
+}
 
 // A Block represents a QBE basic block.
 type Block struct {

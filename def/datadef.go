@@ -71,8 +71,7 @@ func (data *Data) String() string {
 				}
 			}
 		case dataFieldZeroes:
-			parts = append(parts, "z")
-			parts = append(parts, fmt.Sprintf("%v,", f))
+			parts = append(parts, fmt.Sprintf("z %v,", f))
 		default:
 			panic("unreachable")
 		}
