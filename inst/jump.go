@@ -64,3 +64,8 @@ func (b *Block) InsertRet(value value.Value) {
 func (b *Block) InsertHlt() {
 	b.jump = hlt{}
 }
+
+// IsTerminated returns true iff there is a terminating instruction at the end of b.
+func (b *Block) IsTerminated() bool {
+	return b.jump != nil
+}
