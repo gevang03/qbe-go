@@ -42,7 +42,7 @@ func (data *Data) InsertValue(type_ types.ExtendedType, item ...value.DataItem) 
 	data.fields = append(data.fields, dataFieldValue{type_, item})
 }
 
-// InsertValue inserts count zeroes to the end of data.
+// InsertZeroes inserts count zeroes to the end of data.
 func (data *Data) InsertZeroes(count uint) {
 	data.fields = append(data.fields, dataFieldZeroes(count))
 }

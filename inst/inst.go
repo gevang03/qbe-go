@@ -1,4 +1,4 @@
-// package inst exports functions and types used to generate basic blocks and instructions for QBE code.
+// Package inst exports functions and types used to generate basic blocks and instructions for QBE code.
 package inst
 
 import (

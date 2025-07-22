@@ -60,7 +60,7 @@ func (f *Function) InsertBlock(label inst.Label) *inst.Block {
 	return f.blocks[len(f.blocks)-1]
 }
 
-// InsertBlock inserts a new [inst.Block] at the end of the function body,
+// InsertBlockAuto inserts a new [inst.Block] at the end of the function body,
 // with an auto-generated label of the form /@\.L\d+/. Refrain from creating
 // labels of this form and using this function to ensure uniqueness.
 // Returns a reference to that block.

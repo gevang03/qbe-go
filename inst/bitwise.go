@@ -12,7 +12,7 @@ func (b *Block) InsertOr(dest value.Temporary, type_ types.IntegralType, src1, s
 	b.insertInstruction(inst)
 }
 
-// InsertXOr adds an xor instruction at the end of b, storing the bitwise xor of
+// InsertXor adds an xor instruction at the end of b, storing the bitwise xor of
 // src1 and src2 to dest with type type_.
 func (b *Block) InsertXor(dest value.Temporary, type_ types.IntegralType, src1, src2 value.Value) {
 	inst := newSimpleInst(xor, dest, type_, src1, src2)
@@ -33,7 +33,7 @@ func (b *Block) InsertSar(dest value.Temporary, type_ types.IntegralType, src1, 
 	b.insertInstruction(inst)
 }
 
-// InsertSar adds a sar instruction at the end of b, storing the value of src1 shifted by src2 bits
+// InsertShr adds a shr instruction at the end of b, storing the value of src1 shifted by src2 bits
 // to the right and zero extended to dest with type type_.
 func (b *Block) InsertShr(dest value.Temporary, type_ types.IntegralType, src1, src2 value.Value) {
 	inst := newSimpleInst(shr, dest, type_, src1, src2)

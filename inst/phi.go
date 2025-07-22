@@ -22,8 +22,8 @@ type phi struct {
 
 // InsertPhi adds a phi instruction to b to temporary dest with type_ type and sources as arguments.
 func (b *Block) InsertPhi(dest value.Temporary, type_ types.BaseType, sources ...PhiSrc) {
-	phi := phi{dest, type_, sources}
-	b.phis = append(b.phis, phi)
+	phi_ := phi{dest, type_, sources}
+	b.phis = append(b.phis, phi_)
 }
 
 func (phi phi) String() string {

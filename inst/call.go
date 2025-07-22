@@ -25,29 +25,29 @@ type CallInst struct {
 func (*CallInst) isInst() {}
 
 // String converts inst to a string compatible with QBE code.
-func (inst *CallInst) String() string {
+func (c *CallInst) String() string {
 	var builder strings.Builder
-	if inst.Dest != nil {
-		builder.WriteString(inst.Dest.Name.String())
+	if c.Dest != nil {
+		builder.WriteString(c.Dest.Name.String())
 		builder.WriteString(" =")
-		builder.WriteString(fmt.Sprint(inst.Dest.Type))
+		builder.WriteString(fmt.Sprint(c.Dest.Type))
 		builder.WriteByte(' ')
 	}
 	builder.WriteString("call ")
-	builder.WriteString(fmt.Sprint(inst.target))
+	builder.WriteString(fmt.Sprint(c.target))
 	builder.WriteByte('(')
-	if inst.Env != nil {
+	if c.Env != nil {
 		builder.WriteString("env ")
-		builder.WriteString(inst.Env.String())
+		builder.WriteString(c.Env.String())
 		builder.WriteString(", ")
 	}
-	for _, arg := range inst.args {
+	for _, arg := range c.args {
 		builder.WriteString(fmt.Sprint(arg.Type))
 		builder.WriteByte(' ')
 		builder.WriteString(fmt.Sprint(arg.Value))
 		builder.WriteString(", ")
 	}
-	if inst.Variadic {
+	if c.Variadic {
 		builder.WriteString("...")
 	}
 	builder.WriteByte(')')

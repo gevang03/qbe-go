@@ -1,4 +1,4 @@
-// package value exports types used as [def.Data] members
+// Package value exports types used as [def.Data] members
 // and as instruction operands in the [inst] package.
 package value
 

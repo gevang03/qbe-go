@@ -1,4 +1,4 @@
-// package types exports types and type constructors used in QBE definitions and instructions.
+// Package types exports types and type constructors used in QBE definitions and instructions.
 package types
 
 type (
@@ -26,7 +26,7 @@ type (
 		isBaseType()
 	}
 
-	// An Extended type is any [BaseType] or the values returned by [Half] and [Byte].
+	// An ExtendedType is any [BaseType] or the values returned by [Half] and [Byte].
 	ExtendedType interface {
 		ABIType
 		SubType

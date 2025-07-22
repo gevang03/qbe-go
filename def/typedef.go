@@ -50,7 +50,7 @@ func NewUnion(name types.TypeName) *Union {
 	return &Union{name, 0, nil}
 }
 
-// NewUnion returns a new [Opaque] with typename name,
+// NewOpaque returns a new [Opaque] with typename name,
 // alignment align and size equal to size.
 func NewOpaque(name types.TypeName, align uint, size uint) *Opaque {
 	return &Opaque{name, align, size}

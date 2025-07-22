@@ -99,7 +99,7 @@ func (b *Block) InsertTruncd(dest value.Temporary, src value.Value) {
 	b.insertInstruction(inst)
 }
 
-// InsertTruncd adds a cast instruction at the end of b, casting value src
+// InsertCast adds a cast instruction at the end of b, casting value src
 // to type type_ and storing at dest.
 func (b *Block) InsertCast(dest value.Temporary, type_ types.BaseType, src value.Value) {
 	inst := newSimpleInst(cast, dest, type_, src)
