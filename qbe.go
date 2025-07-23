@@ -2,9 +2,7 @@
 package qbe
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 
 	"github.com/gevang03/qbe-go/def"
 	"github.com/gevang03/qbe-go/types"
@@ -67,35 +65,4 @@ func (mod *Module) DefineFunction(name value.GlobalSymbol) *def.Function {
 	f := def.NewFunction(name)
 	mod.insertDef(name, f)
 	return f
-}
-
-// ToIL writes mod as a QBE IL file to w. Returns number of bytes written and if an error occured.
-func (mod *Module) ToIL(w *bufio.Writer) (int, error) {
-	written := 0
-	for _, def := range mod.definitions {
-		count, err := fmt.Fprint(w, def)
-		written += count
-		if err != nil {
-			return written, err
-		}
-		if err = w.WriteByte('\n'); err != nil {
-			return written, err
-		}
-	}
-	return written, nil
-}
-
-// ToFile writes mod to a file with same name as mod. Returns non nil on error.
-func (mod *Module) ToFile() error {
-	f, err := os.Create(mod.name)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	w := bufio.NewWriter(f)
-	_, err = mod.ToIL(w)
-	if err != nil {
-		return err
-	}
-	return w.Flush()
 }
