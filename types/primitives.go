@@ -71,11 +71,12 @@ func UnsignedByte() SubWordType {
 
 // SetPointerType sets the type of pointer to pointerType. pointerType must be either word or long.
 func SetPointerType(pointerType IntegralType) {
-	if pointerType == word {
+	switch pointerType {
+	case word:
 		pointer = word
-	} else if pointerType == long {
+	case long:
 		pointer = long
-	} else {
+	default:
 		panic("Pointer Type must be either word or long")
 	}
 }
