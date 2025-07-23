@@ -19,20 +19,13 @@ const (
 
 // String converts target to a string compatible with the `qbe -t` option.
 func (target Target) String() string {
-	switch target {
-	case AMD64Apple:
-		return "amd64_apple"
-	case AMD64SysV:
-		return "amd64_sysv"
-	case ARM64:
-		return "arm64"
-	case ARM64Apple:
-		return "arm64_apple"
-	case RV64:
-		return "rv64"
-	default:
-		panic(fmt.Sprintf("unexpected qbe.Target: %#v", target))
-	}
+	return [...]string{
+		AMD64SysV:  "amd64_sysv",
+		AMD64Apple: "amd64_apple",
+		ARM64:      "arm64",
+		ARM64Apple: "arm64_apple",
+		RV64:       "rv64",
+	}[target]
 }
 
 // ToIL writes mod as a QBE IL file to w. Returns number of bytes written and if an error occured.
