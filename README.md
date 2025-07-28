@@ -11,9 +11,7 @@ import (
 	"bufio"
 	"os"
 
-	"github.com/gevang03/qbe-go"
-	"github.com/gevang03/qbe-go/types"
-	"github.com/gevang03/qbe-go/value"
+	"github.com/gevang03/qbe-go/pkg/qbe"
 )
 
 func main() {
@@ -23,22 +21,21 @@ func main() {
 	// Define string data
 	cstr := mod.DefineData("message")
 	cstr.SectionName = ".rodata"
-	cstr.InsertValue(types.Byte(),
-		value.DataString("Hello, world!"), value.Integer(0))
+	cstr.InsertValue(qbe.ByteType(), qbe.DataString("Hello, world!"), qbe.Integer(0))
 
 	// Define main function
 	mainFn := mod.DefineFunction("main")
 	mainFn.Export = true
-	mainFn.RetType = types.Word()
+	mainFn.RetType = qbe.WordType()
 
 	block := mainFn.InsertBlockAuto()
 
 	// Call puts function
-	putsCall := block.InsertCall(value.GlobalSymbol("puts"))
-	putsCall.InsertArg(types.Pointer(), cstr.Name)
+	putsCall := block.InsertCall(qbe.GlobalSymbol("puts"))
+	putsCall.InsertArg(qbe.PointerType(), cstr.Name)
 
 	// Return 0 from main
-	block.InsertRet(value.Integer(0))
+	block.InsertRet(qbe.Integer(0))
 
 	// Write IL to stdout
 	w := bufio.NewWriter(os.Stdout)
