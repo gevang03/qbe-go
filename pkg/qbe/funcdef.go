@@ -17,7 +17,7 @@ type param struct {
 type Function struct {
 	Linkage               // The linkage of the function, cannot be thread
 	RetType  ABIType      // The return type of the function
-	Name     GlobalSymbol // The symbol that references the function
+	name     GlobalSymbol // The symbol that references the function
 	Env      *Temporary   // Parameter used to implement closures
 	params   []param
 	Variadic bool // Set if function is variadic.
@@ -34,7 +34,7 @@ func newFunction(name GlobalSymbol) *Function {
 	return &Function{
 		Linkage:  PrivateLinkage(),
 		RetType:  nil,
-		Name:     name,
+		name:     name,
 		Env:      nil,
 		params:   nil,
 		Variadic: false,
@@ -42,6 +42,11 @@ func newFunction(name GlobalSymbol) *Function {
 		labelGen: 0,
 		tmpGen:   0,
 	}
+}
+
+// Name returns the name of f.
+func (f *Function) Name() GlobalSymbol {
+	return f.name
 }
 
 // InsertParam inserts at the end of the parameter list of f a new parameter named name with type type_.
@@ -84,10 +89,10 @@ func (f *Function) String() string {
 	}
 	builder.WriteString("function ")
 	if f.RetType != nil {
-		builder.WriteString(fmt.Sprint(f.RetType))
+		builder.WriteString(f.RetType.Name())
 		builder.WriteByte(' ')
 	}
-	builder.WriteString(f.Name.String())
+	builder.WriteString(f.name.String())
 	builder.WriteByte('(')
 	if f.Env != nil {
 		builder.WriteString("env ")
@@ -95,7 +100,7 @@ func (f *Function) String() string {
 		builder.WriteString(", ")
 	}
 	for _, param := range f.params {
-		builder.WriteString(fmt.Sprint(param.Type))
+		builder.WriteString(param.Type.Name())
 		builder.WriteByte(' ')
 		builder.WriteString(param.Name.String())
 		builder.WriteString(", ")

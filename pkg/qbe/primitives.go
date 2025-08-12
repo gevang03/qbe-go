@@ -1,5 +1,7 @@
 package qbe
 
+import "fmt"
+
 type primitiveType int
 
 const (
@@ -16,8 +18,6 @@ const (
 	signedHalfType
 	unsignedHalfType
 )
-
-var pointer MemoryType = longType
 
 // WordType returns the type for 32-bit integer.
 func WordType() IntegralType {
@@ -69,21 +69,10 @@ func UnsignedByteType() SubWordType {
 	return unsignedByteType
 }
 
-// SetPointerType sets the type of pointer to pointerType. pointerType must be either word or long.
-func SetPointerType(pointerType IntegralType) {
-	switch pointerType {
-	case wordType:
-		pointer = wordType
-	case longType:
-		pointer = longType
-	default:
-		panic("Pointer Type must be either word or long")
-	}
-}
-
-// PointerType returns the type of PointerType used. Equivalent to one of [WordType] or [LongType].
+// PointerType returns the type for pointers. Equivalent to [LongType] as
+// QBE currently supports 64-bit platforms only.
 func PointerType() MemoryType {
-	return pointer
+	return longType
 }
 
 func (primitiveType) isMemoryType()        {}
@@ -94,6 +83,37 @@ func (primitiveType) isExtendedType()      {}
 func (primitiveType) isSubType()           {}
 func (primitiveType) isABIType()           {}
 func (primitiveType) isSubWordType()       {}
+
+func (p primitiveType) SizeOf() uint {
+	switch p {
+	case byteType:
+		return 1
+	case doubleType:
+		return 8
+	case halfType:
+		return 2
+	case longType:
+		return 8
+	case signedByteType:
+		return 1
+	case signedHalfType:
+		return 2
+	case singleType:
+		return 4
+	case unsignedByteType:
+		return 1
+	case unsignedHalfType:
+		return 2
+	case wordType:
+		return 4
+	default:
+		panic(fmt.Sprintf("unexpected qbe.primitiveType: %#v", p))
+	}
+}
+
+func (p primitiveType) AlignOf() uint {
+	return p.SizeOf()
+}
 
 func (p primitiveType) String() string {
 	return [...]string{
@@ -108,4 +128,8 @@ func (p primitiveType) String() string {
 		signedHalfType:   "sh",
 		unsignedHalfType: "uh",
 	}[p]
+}
+
+func (p primitiveType) Name() string {
+	return p.String()
 }

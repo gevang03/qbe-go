@@ -8,9 +8,10 @@ import (
 // A Data struct represent a data definition in QBE IL.
 type Data struct {
 	Linkage              // The linkage of the data definition
-	Name    GlobalSymbol // The symbol that references the data
+	name    GlobalSymbol // The symbol that references the data
 	Align   uint         // The required alignment of the data. Set to zero for default alignment
 	fields  []dataField  // Values contained into the data definition.
+	size    uint
 }
 
 func (*Data) isDefinition() {}
@@ -31,17 +32,41 @@ func (dataFieldZeroes) isDataField() {}
 
 // newData returns a new Data with symbol name, private linkage aligment 0, and no data entries.
 func newData(name GlobalSymbol) *Data {
-	return &Data{Linkage: PrivateLinkage(), Name: name, Align: 0, fields: nil}
+	return &Data{Linkage: PrivateLinkage(), name: name, Align: 0, fields: nil, size: 0}
 }
 
-// InsertValue inserts to the end of the data entries the values of item... with type type_.
-func (data *Data) InsertValue(type_ ExtendedType, item ...DataItem) {
-	data.fields = append(data.fields, dataFieldValue{type_, item})
+// Name returns the name of data.
+func (data *Data) Name() GlobalSymbol {
+	return data.name
+}
+
+// InsertValue inserts to the end of the data entries the values of items with type type_.
+func (data *Data) InsertValue(type_ ExtendedType, items ...DataItem) {
+	if type_ != ByteType() {
+		data.size += type_.SizeOf() * uint(len(items))
+	} else {
+		// TODO: make DataString a special case to avoid this meaningless looping
+		// in case of just byte values.
+		for _, item := range items {
+			if str, ok := item.(DataString); ok {
+				data.size += uint(len(str))
+			} else {
+				data.size += 1
+			}
+		}
+	}
+	data.fields = append(data.fields, dataFieldValue{type_, items})
 }
 
 // InsertZeroes inserts count zeroes to the end of data.
 func (data *Data) InsertZeroes(count uint) {
+	data.size += count
 	data.fields = append(data.fields, dataFieldZeroes(count))
+}
+
+// SizeOf returns the number of bytes needed for data.
+func (data *Data) SizeOf() uint {
+	return data.size
 }
 
 // String converts data to a string compatible with QBE code.
@@ -51,7 +76,7 @@ func (data *Data) String() string {
 	if linkage != "" {
 		parts = append(parts, linkage)
 	}
-	parts = append(parts, "data", data.Name.String(), "=")
+	parts = append(parts, "data", data.name.String(), "=")
 	if data.Align != 0 {
 		parts = append(parts, fmt.Sprint(data.Align))
 	}

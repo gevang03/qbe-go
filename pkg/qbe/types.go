@@ -32,7 +32,7 @@ type (
 		isExtendedType()
 	}
 
-	// A SubType is any [ExtendedType] or a [TypeName].
+	// A SubType is any [ExtendedType] or a [TypeDef].
 	SubType interface {
 		ABIType
 		isSubType()
@@ -42,6 +42,19 @@ type (
 	// namely values returned by [SignedHalf], [UnsignedHalf], [SignedByte], [UnsignedByte].
 	SubWordType interface{ isSubWordType() }
 
-	// An ABIType is any [BaseType], [SubWordType] or [TypeName].
-	ABIType interface{ isABIType() }
+	// An ABIType is any [BaseType], [SubWordType] or [TypeDef].
+	ABIType interface {
+		// SizeOf returns the size of the ABIType.
+		SizeOf() uint
+		// AlignOf returns the alignment of the ABIType.
+		AlignOf() uint
+		isABIType()
+		Name() string
+	}
+
+	// A TypeDef is one of [Struct], [Union], or [Opaque].
+	TypeDef interface {
+		SubType
+		getFields() map[TypeDef]struct{}
+	}
 )

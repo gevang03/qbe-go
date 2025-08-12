@@ -32,7 +32,7 @@ func main() {
 
 	// Call puts function
 	putsCall := block.InsertCall(qbe.GlobalSymbol("puts"))
-	putsCall.InsertArg(qbe.PointerType(), cstr.Name)
+	putsCall.InsertArg(qbe.PointerType(), cstr.Name())
 
 	// Return 0 from main
 	block.InsertRet(qbe.Integer(0))
@@ -42,6 +42,8 @@ func main() {
 	if _, err := mod.ToIL(w); err != nil {
 		panic(err)
 	}
-	w.Flush()
+	if err := w.Flush(); err != nil {
+		panic(err)
+	}
 }
 ```

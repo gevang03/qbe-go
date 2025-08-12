@@ -3,10 +3,12 @@ package qbe
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 )
 
+// Target represents the architecture to generate assembly for with qbe.
 type Target int
 
 const (
@@ -28,16 +30,30 @@ func (target Target) String() string {
 	}[target]
 }
 
-// ToIL writes mod as a QBE IL file to w. Returns number of bytes written and if an error occured.
-func (mod *Module) ToIL(w *bufio.Writer) (int, error) {
+// ToIL writes mod as QBE IL to w. Returns number of bytes written and if an error occured.
+func (mod *Module) ToIL(w io.Writer) (int, error) {
 	written := 0
+	for _, typeDef := range mod.sortTypes() {
+		count, err := fmt.Fprint(w, typeDef)
+		written += count
+		if err != nil {
+			return written, err
+		}
+		count, err = io.WriteString(w, "\n\n")
+		written += count
+		if err != nil {
+			return written, err
+		}
+	}
 	for _, def := range mod.definitions {
 		count, err := fmt.Fprint(w, def)
 		written += count
 		if err != nil {
 			return written, err
 		}
-		if err = w.WriteByte('\n'); err != nil {
+		count, err = io.WriteString(w, "\n\n")
+		written += count
+		if err != nil {
 			return written, err
 		}
 	}
