@@ -1,7 +1,7 @@
 package qbe
 
-// Convention: temporaries of the form /%\.t\d+/ and labels of the form
-// /@\.L\d+/ are reserved for automatic name generation.
+// Convention: temporaries of the form /%<name>.\d+/ and labels of the form
+// /@<name>.\d+/ are reserved for automatic name generation.
 
 import (
 	"fmt"
@@ -62,19 +62,19 @@ func (f *Function) InsertBlock(label Label) *Block {
 }
 
 // InsertBlockAuto inserts a new [Block] at the end of the function body,
-// with an auto-generated label of the form /@\.L\d+/. Refrain from creating
+// with an auto-generated label of the form /@<name>\.\d+/. Refrain from creating
 // labels of this form and using this function to ensure uniqueness.
 // Returns a reference to that block.
-func (f *Function) InsertBlockAuto() *Block {
-	label := Label(fmt.Sprintf(".L%v", f.labelGen))
+func (f *Function) InsertBlockAuto(name string) *Block {
+	label := Label(fmt.Sprintf("%v.%v", name, f.labelGen))
 	f.labelGen++
 	return f.InsertBlock(label)
 }
 
-// NewTemporary returns a new [Temporary] of the form /%.t\d+/. Refrain
+// NewTemporary returns a new [Temporary] of the form /%<name>\.\d+/. Refrain
 // from creating temporaries of this form and using this function to ensure uniqueness.
-func (f *Function) NewTemporary() Temporary {
-	tmp := Temporary(fmt.Sprintf(".t%v", f.tmpGen))
+func (f *Function) NewTemporary(name string) Temporary {
+	tmp := Temporary(fmt.Sprintf("%v.%v", name, f.tmpGen))
 	f.tmpGen++
 	return tmp
 }

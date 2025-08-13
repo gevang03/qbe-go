@@ -28,7 +28,7 @@ func main() {
 	mainFn.Export = true
 	mainFn.RetType = qbe.WordType()
 
-	block := mainFn.InsertBlockAuto()
+	block := mainFn.InsertBlock("start")
 
 	// Call puts function
 	putsCall := block.InsertCall(qbe.GlobalSymbol("puts"))

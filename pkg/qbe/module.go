@@ -1,6 +1,9 @@
 // Package qbe implements an API to generate QBE IL files.
 package qbe
 
+// Convention: global symbols of the form /$<name>.\d+/
+// are reserved for automatic name generation.
+
 import "fmt"
 
 // A Module represents a single file of definitions
@@ -8,6 +11,7 @@ type Module struct {
 	name        string
 	typeDefs    map[TypeName]TypeDef
 	definitions map[GlobalSymbol]Definition
+	symGen      uint
 }
 
 // NewModule returns a new [Module] that can be written to file name
@@ -16,6 +20,7 @@ func NewModule(name string) *Module {
 		name,
 		make(map[TypeName]TypeDef),
 		make(map[GlobalSymbol]Definition),
+		0,
 	}
 }
 
@@ -84,4 +89,12 @@ func (mod *Module) GetTypeDef(name TypeName) (typeDef TypeDef, ok bool) {
 // Name returns the name of mod.
 func (mod *Module) Name() string {
 	return mod.name
+}
+
+// NewGlobalSymbol returns a new [GlobalSymbol] of the form /$<name>\.\d+/. Refrain
+// from creating symbols of this form and using this function to ensure uniqueness.
+func (mod *Module) NewGlobalSymbol(name string) GlobalSymbol {
+	sym := GlobalSymbol(fmt.Sprintf("%v.%v", name, mod.symGen))
+	mod.symGen++
+	return sym
 }
