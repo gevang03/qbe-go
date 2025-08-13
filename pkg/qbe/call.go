@@ -27,7 +27,7 @@ func (c *CallInst) String() string {
 	if c.Dest != nil {
 		builder.WriteString(c.Dest.Name.String())
 		builder.WriteString(" =")
-		builder.WriteString(fmt.Sprint(c.Dest.Type))
+		builder.WriteString(fmt.Sprint(c.Dest.Type.Name()))
 		builder.WriteByte(' ')
 	}
 	builder.WriteString("call ")
@@ -39,7 +39,7 @@ func (c *CallInst) String() string {
 		builder.WriteString(", ")
 	}
 	for _, arg := range c.args {
-		builder.WriteString(fmt.Sprint(arg.Type))
+		builder.WriteString(fmt.Sprint(arg.Type.Name()))
 		builder.WriteByte(' ')
 		builder.WriteString(fmt.Sprint(arg.Value))
 		builder.WriteString(", ")
