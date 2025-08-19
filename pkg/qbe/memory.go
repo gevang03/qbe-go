@@ -1,23 +1,26 @@
 package qbe
 
+import "fmt"
+
 // InsertStore adds a store instruction at the end of b, storing src to the
 // address at dest. The size and type of the instruction is determined by type_.
 func (b *Block) InsertStore(type_ ExtendedType, src, dest Value) {
 	var op opcode
-	if type_ == DoubleType() {
+	switch type_ {
+	case DoubleType():
 		op = stored
-	} else if type_ == SingleType() {
+	case SingleType():
 		op = stores
-	} else if type_ == LongType() {
+	case LongType():
 		op = storel
-	} else if type_ == WordType() {
+	case WordType():
 		op = storew
-	} else if type_ == HalfType() {
+	case HalfType():
 		op = storeh
-	} else if type_ == ByteType() {
+	case ByteType():
 		op = storeb
-	} else {
-		panic("unreachable")
+	default:
+		panic(fmt.Sprintf("unexpected type %#v", type_))
 	}
 	inst := newSimpleInstNoDest(op, src, dest)
 	b.insertInstruction(inst)
@@ -30,32 +33,34 @@ func (b *Block) InsertStore(type_ ExtendedType, src, dest Value) {
 func (b *Block) InsertLoad(dest Temporary, destType BaseType,
 	src Value, srcType ExtendedType, signed bool) {
 	var op opcode
-	if srcType == DoubleType() {
+	switch srcType {
+	case DoubleType():
 		op = loadd
-	} else if srcType == SingleType() {
+	case SingleType():
 		op = loads
-	} else if srcType == LongType() {
+	case LongType():
 		op = loadl
-	} else if srcType == WordType() {
+	case WordType():
 		if signed {
 			op = loadsw
 		} else {
 			op = loaduw
 		}
-	} else if srcType == HalfType() {
+	case HalfType():
 		if signed {
 			op = loadsh
 		} else {
 			op = loaduh
 		}
-	} else if srcType == ByteType() {
+	case ByteType():
 		if signed {
 			op = loadsb
 		} else {
 			op = loadub
 		}
-	} else {
-		panic("unreachable")
+	default:
+		panic(fmt.Sprintf("unexpected source type %#v", srcType))
+
 	}
 	inst := newSimpleInst(op, dest, destType, src)
 	b.insertInstruction(inst)

@@ -44,11 +44,13 @@ type (
 
 	// An ABIType is any [BaseType], [SubWordType] or [TypeDef].
 	ABIType interface {
+		RetType
 		// SizeOf returns the size of the ABIType.
 		SizeOf() uint
 		// AlignOf returns the alignment of the ABIType.
 		AlignOf() uint
 		isABIType()
+		// Name returns the name of a type as string.
 		Name() string
 	}
 
@@ -56,5 +58,10 @@ type (
 	TypeDef interface {
 		SubType
 		getFields() map[TypeDef]struct{}
+	}
+
+	// A RetType is an [ABIType] or [VoidType].
+	RetType interface {
+		isRetType()
 	}
 )

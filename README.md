@@ -24,9 +24,8 @@ func main() {
 	cstr.InsertValue(qbe.ByteType(), qbe.DataString("Hello, world!"), qbe.Integer(0))
 
 	// Define main function
-	mainFn := mod.DefineFunction("main")
+	mainFn := mod.DefineFunction("main", qbe.WordType())
 	mainFn.Export = true
-	mainFn.RetType = qbe.WordType()
 
 	block := mainFn.InsertBlock("start")
 

@@ -11,16 +11,18 @@ type Module struct {
 	name        string
 	typeDefs    map[TypeName]TypeDef
 	definitions map[GlobalSymbol]Definition
+	defOrder    []GlobalSymbol
 	symGen      uint
 }
 
 // NewModule returns a new [Module] that can be written to file name
 func NewModule(name string) *Module {
 	return &Module{
-		name,
-		make(map[TypeName]TypeDef),
-		make(map[GlobalSymbol]Definition),
-		0,
+		name:        name,
+		typeDefs:    make(map[TypeName]TypeDef),
+		definitions: make(map[GlobalSymbol]Definition),
+		defOrder:    nil,
+		symGen:      0,
 	}
 }
 
@@ -28,6 +30,7 @@ func (mod *Module) insertDef(name GlobalSymbol, def Definition) {
 	if _, exists := mod.definitions[name]; exists {
 		panic(fmt.Sprintf("duplicate definition of `%v'", name.String()))
 	}
+	mod.defOrder = append(mod.defOrder, name)
 	mod.definitions[name] = def
 }
 
@@ -67,9 +70,11 @@ func (mod *Module) DefineData(name GlobalSymbol) *Data {
 	return d
 }
 
-// DefineFunction inserts into mod a reference to [Function] with symbol name.
-func (mod *Module) DefineFunction(name GlobalSymbol) *Function {
-	f := newFunction(name)
+// DefineFunction inserts into mod a reference to [Function] with symbol name,
+// private linkage, return type retType, no env or any other parameters and it
+// is not set as variadic.
+func (mod *Module) DefineFunction(name GlobalSymbol, retType RetType) *Function {
+	f := newFunction(name, retType)
 	mod.insertDef(name, f)
 	return f
 }

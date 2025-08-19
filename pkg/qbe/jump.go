@@ -47,6 +47,9 @@ func (b *Block) InsertJmp(label Label) {
 // If value evaluates to non-zero, control flow directs to notZero,
 // otherwise to zero.
 func (b *Block) InsertJnz(value Value, notZero, zero Label) {
+	if value == nil {
+		panic("jnz value cannot be nil")
+	}
 	b.jump = jnz{value, notZero, zero}
 }
 

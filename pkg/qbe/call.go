@@ -12,9 +12,9 @@ type arg struct {
 
 // A CallInst represents a call instruction.
 type CallInst struct {
-	Dest     *Dest      // Where the result of the call is stored, nil if no result.
-	Env      *Temporary // The env parameter, nil if not passed.
-	Variadic bool       // Set to true if the function called is variadic.
+	dest     *dest      // Where the result of the call is stored, nil if no result.
+	env      *Temporary // The env parameter, nil if not passed.
+	variadic bool       // Set to true if the function called is variadic. Defaults to false
 	target   Value
 	args     []arg
 }
@@ -24,18 +24,18 @@ func (*CallInst) isInst() {}
 // String converts inst to a string compatible with QBE code.
 func (c *CallInst) String() string {
 	var builder strings.Builder
-	if c.Dest != nil {
-		builder.WriteString(c.Dest.Name.String())
+	if c.dest != nil {
+		builder.WriteString(c.dest.Name.String())
 		builder.WriteString(" =")
-		builder.WriteString(fmt.Sprint(c.Dest.Type.Name()))
+		builder.WriteString(fmt.Sprint(c.dest.Type.Name()))
 		builder.WriteByte(' ')
 	}
 	builder.WriteString("call ")
 	builder.WriteString(fmt.Sprint(c.target))
 	builder.WriteByte('(')
-	if c.Env != nil {
+	if c.env != nil {
 		builder.WriteString("env ")
-		builder.WriteString(c.Env.String())
+		builder.WriteString(c.env.String())
 		builder.WriteString(", ")
 	}
 	for _, arg := range c.args {
@@ -44,7 +44,7 @@ func (c *CallInst) String() string {
 		builder.WriteString(fmt.Sprint(arg.Value))
 		builder.WriteString(", ")
 	}
-	if c.Variadic {
+	if c.variadic {
 		builder.WriteString("...")
 	}
 	builder.WriteByte(')')
@@ -52,12 +52,16 @@ func (c *CallInst) String() string {
 }
 
 // InsertCall adds a call instruction to b with callee target and
-// returns a pointer to the generated CallInst.
+// returns a pointer to the generated CallInst. The call instruction has no
+// destination, no env variable and is not variadic.
 func (b *Block) InsertCall(target Value) *CallInst {
+	if target == nil {
+		panic("target of call instruction cannot be nil")
+	}
 	inst := &CallInst{
-		Dest:     nil,
-		Env:      nil,
-		Variadic: false,
+		dest:     nil,
+		env:      nil,
+		variadic: false,
 		target:   target,
 		args:     nil,
 	}
@@ -65,8 +69,32 @@ func (b *Block) InsertCall(target Value) *CallInst {
 	return b.insts[len(b.insts)-1].(*CallInst)
 }
 
+// SetDest stores the result of c to the temporary name with type type_.
+func (c *CallInst) SetDest(name Temporary, type_ ABIType) {
+	if type_ == nil {
+		panic("call destination type cannot be nil")
+	}
+	c.dest = &dest{name, type_}
+}
+
+// SetEnv sets the environment temporary of c to env.
+func (c *CallInst) SetEnv(env Temporary) {
+	c.env = &env
+}
+
+// SetVariadic sets c as variadic.
+func (c *CallInst) SetVariadic() {
+	c.variadic = true
+}
+
 // InsertArg adds argument value with type type_ to the end of the argument list of c.
 func (c *CallInst) InsertArg(type_ ABIType, value Value) {
+	if type_ == nil {
+		panic("call argument type cannot be nil")
+	}
+	if value == nil {
+		panic("call argument value cannot be nil")
+	}
 	c.args = append(c.args, arg{type_, value})
 }
 

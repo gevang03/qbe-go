@@ -16,11 +16,11 @@ type param struct {
 // A Function represents a function definition in QBE IL.
 type Function struct {
 	Linkage               // The linkage of the function, cannot be thread
-	RetType  ABIType      // The return type of the function
+	retType  RetType      // The return type of the function
 	name     GlobalSymbol // The symbol that references the function
-	Env      *Temporary   // Parameter used to implement closures
+	env      *Temporary   // Parameter used to implement closures
 	params   []param
-	Variadic bool // Set if function is variadic.
+	variadic bool // Set if function is variadic.
 	blocks   []*Block
 	labelGen uint
 	tmpGen   uint
@@ -29,15 +29,18 @@ type Function struct {
 func (f *Function) isDefinition() {}
 
 // newFunction returns a new [Function] with function name name, private linkage,
-// no return type, no env or any other parameters and it is not set as variadic.
-func newFunction(name GlobalSymbol) *Function {
+// return type retType, no env or any other parameters and it is not set as variadic.
+func newFunction(name GlobalSymbol, retType RetType) *Function {
+	if retType == nil {
+		panic("return type cannot be nil")
+	}
 	return &Function{
 		Linkage:  PrivateLinkage(),
-		RetType:  nil,
+		retType:  retType,
 		name:     name,
-		Env:      nil,
+		env:      nil,
 		params:   nil,
-		Variadic: false,
+		variadic: false,
 		blocks:   nil,
 		labelGen: 0,
 		tmpGen:   0,
@@ -49,8 +52,21 @@ func (f *Function) Name() GlobalSymbol {
 	return f.name
 }
 
+// SetEnv sets the environment temporary of f to env.
+func (f *Function) SetEnv(env Temporary) {
+	f.env = &env
+}
+
+// SetVariadic sets f as variadic.
+func (f *Function) SetVariadic() {
+	f.variadic = true
+}
+
 // InsertParam inserts at the end of the parameter list of f a new parameter named name with type type_.
 func (f *Function) InsertParam(type_ ABIType, name Temporary) {
+	if type_ == nil {
+		panic("parameter type cannot be nil")
+	}
 	f.params = append(f.params, param{type_, name})
 }
 
@@ -88,15 +104,15 @@ func (f *Function) String() string {
 		builder.WriteByte(' ')
 	}
 	builder.WriteString("function ")
-	if f.RetType != nil {
-		builder.WriteString(f.RetType.Name())
+	if f.retType != VoidType() {
+		builder.WriteString(f.retType.(ABIType).Name())
 		builder.WriteByte(' ')
 	}
 	builder.WriteString(f.name.String())
 	builder.WriteByte('(')
-	if f.Env != nil {
+	if f.env != nil {
 		builder.WriteString("env ")
-		builder.WriteString(f.Env.String())
+		builder.WriteString(f.env.String())
 		builder.WriteString(", ")
 	}
 	for _, param := range f.params {
@@ -105,7 +121,7 @@ func (f *Function) String() string {
 		builder.WriteString(param.Name.String())
 		builder.WriteString(", ")
 	}
-	if f.Variadic {
+	if f.variadic {
 		builder.WriteString("...")
 	}
 	builder.WriteString(") {\n")

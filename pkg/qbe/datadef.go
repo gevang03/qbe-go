@@ -42,11 +42,17 @@ func (data *Data) Name() GlobalSymbol {
 
 // InsertValue inserts to the end of the data entries the values of items with type type_.
 func (data *Data) InsertValue(type_ ExtendedType, items ...DataItem) {
+	if type_ == nil {
+		panic("data entry type cannot be nil")
+	}
+	for _, item := range items {
+		if item == nil {
+			panic("data entry cannot be nil")
+		}
+	}
 	if type_ != ByteType() {
 		data.size += type_.SizeOf() * uint(len(items))
 	} else {
-		// TODO: make DataString a special case to avoid this meaningless looping
-		// in case of just byte values.
 		for _, item := range items {
 			if str, ok := item.(DataString); ok {
 				data.size += uint(len(str))

@@ -45,8 +45,8 @@ func (mod *Module) ToIL(w io.Writer) (int, error) {
 			return written, err
 		}
 	}
-	for _, def := range mod.definitions {
-		count, err := fmt.Fprint(w, def)
+	for _, symbol := range mod.defOrder {
+		count, err := fmt.Fprint(w, mod.definitions[symbol])
 		written += count
 		if err != nil {
 			return written, err

@@ -64,6 +64,10 @@ func (*Struct) isABIType() {}
 func (*Union) isABIType()  {}
 func (*Opaque) isABIType() {}
 
+func (*Struct) isRetType() {}
+func (*Union) isRetType()  {}
+func (*Opaque) isRetType() {}
+
 func (s *Struct) Name() string {
 	return s.name.String()
 }
@@ -159,6 +163,9 @@ func (o *Opaque) AlignOf() uint {
 // Never insert types that have not been completed to avoid inconsistencies. Returns
 // then field's index in fl.
 func (fl *FieldList) InsertField(type_ SubType, count uint) int {
+	if type_ == nil {
+		panic("field type cannot be nil")
+	}
 	index := len(fl.fields)
 	fl.fields = append(fl.fields, field{type_, count})
 	fl.size += type_.SizeOf() * count
@@ -169,6 +176,9 @@ func (fl *FieldList) InsertField(type_ SubType, count uint) int {
 // InsertFieldAligned appends field of type type_ and count elements to fl after
 // aligning to type_'s alignment. Returns the field's index in fl.
 func (fl *FieldList) InsertFieldAligned(type_ SubType, count uint) int {
+	if type_ == nil {
+		panic("field type cannot be nil")
+	}
 	alignment := type_.AlignOf()
 	padded := alignedSize(fl.size, alignment)
 	if padded > fl.size {

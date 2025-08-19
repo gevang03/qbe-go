@@ -83,6 +83,7 @@ func (primitiveType) isExtendedType()      {}
 func (primitiveType) isSubType()           {}
 func (primitiveType) isABIType()           {}
 func (primitiveType) isSubWordType()       {}
+func (primitiveType) isRetType()           {}
 
 func (p primitiveType) SizeOf() uint {
 	switch p {
@@ -132,4 +133,13 @@ func (p primitiveType) String() string {
 
 func (p primitiveType) Name() string {
 	return p.String()
+}
+
+type voidType struct{}
+
+func (voidType) isRetType() {}
+
+// VoidType returns the void type. Can only be used as a return type for functions.
+func VoidType() RetType {
+	return voidType{}
 }

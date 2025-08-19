@@ -1,3 +1,3 @@
 module github.com/gevang03/qbe-go
 
-go 1.24
+go 1.21

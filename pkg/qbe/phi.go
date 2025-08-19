@@ -19,6 +19,14 @@ type phi struct {
 
 // InsertPhi adds a phi instruction to b to temporary dest with type_ type and sources as arguments.
 func (b *Block) InsertPhi(dest Temporary, type_ BaseType, sources ...PhiSrc) {
+	if type_ == nil {
+		panic("phi destination type cannot be nil")
+	}
+	for _, src := range sources {
+		if src.Value == nil {
+			panic("phi source value cannot be nil")
+		}
+	}
 	phi_ := phi{dest, type_, sources}
 	b.phis = append(b.phis, phi_)
 }

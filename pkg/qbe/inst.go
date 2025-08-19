@@ -5,15 +5,15 @@ import (
 	"strings"
 )
 
-// A Dest represents the destination to store the result of an instruction.
-type Dest struct {
+// A dest represents the destination to store the result of an instruction.
+type dest struct {
 	Name Temporary // The name of the destination.
 	Type ABIType   // The type of the destination.
 }
 
 type simpleInst struct {
 	opcode
-	*Dest
+	*dest
 	srcs []Value
 }
 
@@ -23,7 +23,7 @@ func (simpleInst) isInst() {}
 
 func (inst simpleInst) String() string {
 	var parts []string
-	if inst.Dest != nil {
+	if inst.dest != nil {
 		parts = append(parts, inst.Name.String())
 		parts = append(parts, fmt.Sprintf("=%v", inst.Type))
 	}
@@ -39,11 +39,24 @@ func (inst simpleInst) String() string {
 }
 
 func newSimpleInst(opcode opcode, name Temporary, type_ BaseType, srcs ...Value) simpleInst {
-	return simpleInst{opcode, &Dest{name, type_}, srcs}
+	checkSrcs(srcs)
+	if type_ == nil {
+		panic("instruction destination type cannot be nil")
+	}
+	return simpleInst{opcode, &dest{name, type_}, srcs}
 }
 
 func newSimpleInstNoDest(opcode opcode, srcs ...Value) simpleInst {
+	checkSrcs(srcs)
 	return simpleInst{opcode, nil, srcs}
+}
+
+func checkSrcs(srcs []Value) {
+	for _, src := range srcs {
+		if src == nil {
+			panic("instruction source values cannot be nil")
+		}
+	}
 }
 
 func (b *Block) insertInstruction(inst inst) {
