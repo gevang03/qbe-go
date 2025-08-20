@@ -75,6 +75,30 @@ func (mod *Module) ToFile() error {
 	return w.Flush()
 }
 
+type processError struct {
+	Name string
+	*exec.ExitError
+	Stderr string
+}
+
+func (e *processError) Error() string {
+	return fmt.Sprintf("%v: %v\n%v", e.Name, e.ExitError, e.Stderr)
+}
+
+func waitCmd(stderr io.Reader, name string, cmd *exec.Cmd) error {
+	stderrBytes, readErr := io.ReadAll(stderr)
+	waitErr := cmd.Wait()
+	if exitErr, ok := waitErr.(*exec.ExitError); ok && readErr == nil {
+		return &processError{name, exitErr, string(stderrBytes)}
+	}
+	return waitErr
+}
+
+func killAndWait(cmd *exec.Cmd) {
+	_ = cmd.Process.Kill()
+	_ = cmd.Wait()
+}
+
 // ToAsm pipes mod IL to qbe and generates assembly for target named mod.name + ".s".
 // Returns non nil on error.
 func (mod *Module) ToAsm(target Target) error {
@@ -83,41 +107,37 @@ func (mod *Module) ToAsm(target Target) error {
 	if err != nil {
 		return err
 	}
-	if err = cmd.Start(); err != nil {
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
 		_ = stdin.Close()
 		return err
 	}
-	w := bufio.NewWriter(stdin)
-	cleanup := func() {
-		if stdin != nil {
-			_ = stdin.Close()
-		}
-		_ = cmd.Process.Kill()
-		_ = cmd.Wait()
+	if err = cmd.Start(); err != nil {
+		_ = stdin.Close()
+		_ = stderr.Close()
+		return err
 	}
+	w := bufio.NewWriter(stdin)
 	if _, err = mod.ToIL(w); err != nil {
-		cleanup()
+		killAndWait(cmd)
 		return err
 	}
 	if err = w.Flush(); err != nil {
-		cleanup()
+		killAndWait(cmd)
 		return err
 	}
 	if err = stdin.Close(); err != nil {
-		stdin = nil
-		cleanup()
+		killAndWait(cmd)
 		return err
 	}
-	return cmd.Wait()
+	return waitCmd(stderr, "qbe", cmd)
 }
 
 // ToObj pipes mod IL to qbe and cc and generates an object file for target named mod.name + ".o".
 // Returns non nil on error.
 func (mod *Module) ToObj(target Target, cflags []string) error {
+	// Initialize qbe process
 	qbe := exec.Command("qbe", "-", "-t", target.String())
-	cargs := []string{"-xassembler", "-", "-c", "-o", mod.name + ".o"}
-	cargs = append(cargs, cflags...)
-	cc := exec.Command("cc", cargs...)
 	qbeStdin, err := qbe.StdinPipe()
 	if err != nil {
 		return err
@@ -127,49 +147,62 @@ func (mod *Module) ToObj(target Target, cflags []string) error {
 		_ = qbeStdin.Close()
 		return err
 	}
-	cc.Stdin = qbeStdout
-	cleanup := func() {
-		if qbeStdin != nil {
-			_ = qbeStdin.Close()
-		}
+	qbeStderr, err := qbe.StderrPipe()
+	if err != nil {
+		_ = qbeStdin.Close()
 		_ = qbeStdout.Close()
-		if qbe.Process != nil {
-			_ = qbe.Process.Kill()
-			_ = qbe.Wait()
-		}
-		if cc.Process != nil {
-			_ = cc.Process.Kill()
-			_ = cc.Wait()
-		}
+		return err
 	}
+
+	// Initialize cc process
+	cargs := []string{"-xassembler", "-", "-c", "-o", mod.name + ".o"}
+	cargs = append(cargs, cflags...)
+	cc := exec.Command("cc", cargs...)
+	cc.Stdin = qbeStdout
+	ccStderr, err := cc.StderrPipe()
+	if err != nil {
+		_ = qbeStdin.Close()
+		_ = qbeStdout.Close()
+		_ = qbeStderr.Close()
+		return err
+	}
+
+	// Start processes
 	if err = qbe.Start(); err != nil {
-		cleanup()
+		_ = qbeStdin.Close()
+		_ = qbeStdout.Close()
+		_ = qbeStderr.Close()
+		_ = ccStderr.Close()
 		return err
 	}
 	if err = cc.Start(); err != nil {
-		cleanup()
+		_ = ccStderr.Close()
+		killAndWait(qbe)
 		return err
 	}
+
+	// Write to pipe
 	w := bufio.NewWriter(qbeStdin)
 	if _, err = mod.ToIL(w); err != nil {
-		cleanup()
+		killAndWait(qbe)
+		killAndWait(cc)
 		return err
 	}
 	if err = w.Flush(); err != nil {
-		cleanup()
+		killAndWait(qbe)
+		killAndWait(cc)
 		return err
 	}
 	if err = qbeStdin.Close(); err != nil {
-		qbeStdin = nil
-		cleanup()
+		killAndWait(qbe)
+		killAndWait(cc)
 		return err
 	}
-	qbeStdin = nil
-	if err = qbe.Wait(); err != nil {
-		qbe.Process = nil
-		cleanup()
+
+	// Wait processes
+	if err = waitCmd(qbeStderr, "qbe", qbe); err != nil {
+		killAndWait(cc)
 		return err
 	}
-	qbe.Process = nil
-	return cc.Wait()
+	return waitCmd(ccStderr, "cc", cc)
 }
